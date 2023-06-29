@@ -1,0 +1,29 @@
+Vagrant.configure('2') do |config|
+  config.vm.box = 'ubuntu/focal64'
+  config.vm.network "private_network", ip: '192.168.33.10'
+  config.vm.hostname = 'nodeserver'
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = 'ubuntu-node'
+    vb.cpus = '1'
+    vb.memory = '1024'
+  end
+
+  config.vm.provision "shell", inline: <<-SHELL
+    sudo apt update -y
+    sudo apt upgrade -y
+    sudo ufw allow ssh
+    sudo ufw allow 80
+    sudo ufw allow 443
+    sudo ufw enable
+    sudo apt install apache2 -y
+    sudo systemctl status apache2
+    sudo apt install php7.4 php7.4-mysql php-common php7.4-cli php7.4-json php7.4-common php7.4-opcache libapache2-mod-php7.4 -y
+    sudo systemctl restart apache2
+    echo '<?php phpinfo(); ?>' | sudo tee -a /var/www/html/phpinfo.php > /dev/null
+    sudo apt install mariadb-server mariadb-client -y
+    sudo /Ubuntu/mysql_secure_installation.sh
+    sudo systemctl status mariadb
+    php --version
+  SHELL
+
+end

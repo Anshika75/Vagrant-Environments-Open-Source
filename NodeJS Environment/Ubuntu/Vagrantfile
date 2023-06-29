@@ -1,0 +1,18 @@
+Vagrant.configure('2') do |config|
+  config.vm.box = 'ubuntu/focal64'
+  config.vm.network "private_network", ip: '192.168.33.10'
+  config.vm.hostname = 'nodeserver'
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = 'ubuntu-node'
+    vb.cpus = '1'
+    vb.memory = '1024'
+  end
+    config.vm.provision "shell", inline: <<-SHELL
+         sudo apt-get install curl
+	 curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash - &&\
+	 sudo apt-get install nodejs
+	 node -v 
+	 cd /tmp
+	 npm create-react-app test
+     SHELL
+end
